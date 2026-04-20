@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P&G Enero 2026 — Zamakona Yards</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f4f6f9;color:#1a1a1a;min-height:100vh}
+.app{max-width:1100px;margin:0 auto;padding:2rem 1.5rem}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;padding-bottom:1.25rem;border-bottom:2px solid #0f3460}
+.header-left{display:flex;align-items:center;gap:16px}
+.logo-text{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#0f3460}
+.dash-title{font-size:22px;font-weight:700;color:#0f3460}
+.period-tag{font-size:11px;color:#666;background:#e8edf5;border:1px solid #c5d0e0;border-radius:6px;padding:4px 10px}
+.nav{display:flex;gap:6px;flex-wrap:wrap}
+.nb{font-size:12px;padding:6px 14px;border:1.5px solid #c5d0e0;border-radius:8px;background:#fff;color:#555;cursor:pointer;font-weight:500;transition:all .15s}
+.nb:hover{background:#e8edf5;border-color:#0f3460;color:#0f3460}
+.nb.active{background:#0f3460;color:#fff;border-color:#0f3460}
+.alert{background:#fff0f0;border:1.5px solid #f09595;border-radius:10px;padding:12px 16px;font-size:13px;color:#a32d2d;margin-bottom:1.25rem;line-height:1.6}
+.alert strong{font-weight:600}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.period-block{background:#fff;border:1px solid #dde3ed;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.period-head{background:#0f3460;padding:10px 16px;display:flex;justify-content:space-between;align-items:center}
+.ph-title{font-size:13px;font-weight:600;color:#fff}
+.ph-vs{font-size:11px;color:rgba(255,255,255,.65)}
+.rrow{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px 16px;border-bottom:1px solid #eef0f4;align-items:start}
+.rrow:last-child{border-bottom:none}
+.rrow.cause{background:#f8f9fc;padding:7px 16px 7px 30px}
+.rrow.mant-row{background:#f8f9fc;padding:7px 16px 7px 30px;border-top:1px dashed #d0d7e4}
+.rl{font-size:13px;color:#1a1a1a;font-weight:600;line-height:1.4}
+.rl.sub{font-size:12px;color:#555;font-weight:400}
+.rv{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.amount{font-size:13px;font-weight:600;color:#1a1a1a;white-space:nowrap}
+.pct-label{font-size:11px;font-weight:400;color:#888;margin-left:4px}
+.delta{font-size:12px;white-space:nowrap;font-weight:500}
+.pos{color:#2d7a3a}.neg{color:#c0392b}.neu{color:#888}
+.section-label{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;margin-top:1.5rem}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.rcard{background:#fff;border:1px solid #dde3ed;border-radius:12px;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.rpos{font-size:10px;color:#888;margin-bottom:3px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.rname{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:6px}
+.rebitda{font-size:17px;font-weight:700;margin-bottom:2px}
+.rmb{font-size:11px;color:#666}
+.bar-bg{height:4px;background:#eee;border-radius:2px;margin-top:10px}
+.bar-fill{height:4px;border-radius:2px;background:#0f3460}
+.bar-fill.red{background:#c0392b}
+.tag-vigilado{font-size:9px;background:#fef3e2;color:#a05c00;padding:2px 6px;border-radius:4px;margin-left:5px;font-weight:600;border:1px solid #f5d48a}
+.footer{margin-top:2.5rem;padding-top:1rem;border-top:1px solid #dde3ed;font-size:11px;color:#aaa;text-align:center}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-left">
+      <div>
+        <div class="logo-text">Zamakona Yards</div>
+        <div class="dash-title">P&G Enero 2026</div>
+      </div>
+      <span class="period-tag">vs media mensual 2025</span>
+    </div>
+    <div class="nav" id="nav"></div>
+  </div>
+  <div id="alert-area"></div>
+  <div class="cols2" id="panels"></div>
+  <div id="ranking-area"></div>
+  <div class="footer">Zamakona Yards · Departamento de FP&A · Enero 2026</div>
+</div>
+<script>
+function fmtExact(v){if(v===null||v===undefined)return'—';return(v<0?'-':'')+Math.round(Math.abs(v)).toLocaleString('es-ES')+'€';}
+function fmtShort(v){if(v===null||v===undefined)return'—';const a=Math.abs(v),s=v<0?'-':'';if(a>=1000000)return s+(a/1000000).toFixed(1).replace('.',',')+' M€';if(a>=1000)return s+Math.round(a/1000).toLocaleString('es-ES')+' mil€';return s+Math.round(a)+'€';}
+function fmtP(v,d=1){if(v===null||v===undefined)return'—';return(v*100).toFixed(d).replace('.',',')+'%';}
+function signPP(v){if(v===null||v===undefined)return'—';return(v>0?'+':'')+(v*100).toFixed(1).replace('.',',')+'%/ingresos';}
+function signRelPct(v){if(v===null||v===undefined)return'';return(v>0?'+':'')+(v*100).toFixed(0)+'%';}
+function clsR(v){return v===null?'neu':v>=0?'pos':'neg';}
+function clsC(v){return v===null?'neu':v>0?'neg':'pos';}
+function costImpact(actual,ref){return-(actual-ref);}
+function costRowHtml(aE,rE){const spentMore=Math.abs(aE)-Math.abs(rE);const pct=rE!==0?spentMore/Math.abs(rE):null;const cls=spentMore>0?'neg':'pos';const sign=spentMore>0?'+':'-';const abs=Math.abs(spentMore);let eStr;if(abs>=1000000)eStr=sign+(abs/1000000).toFixed(1).replace('.',',')+' M€';else if(abs>=1000)eStr=sign+Math.round(abs/1000).toLocaleString('es-ES')+' mil€';else eStr=sign+Math.round(abs)+'€';const pctStr=pct!==null?`; ${signRelPct(pct)}`:'';return`<span class="delta ${cls}">${eStr}${pctStr}</span>`;}
+const D={grupo:{name:'Grupo Zamakona',alerta:null,ranking:true,mes:{ti:{a:3339862,dE:254579},mb:{a:1493952,pct:0.4473,refPct:0.3982,dE:265381,causes:[{label:'Compras de materiales',actual:-0.03543,ref:-0.12333},{label:'Subcontratas externas',actual:-0.38712,ref:-0.34957}]},ebitda:{a:823359,pct:0.2465,dE:371065,causes:[{label:'Gastos operativos',aE:-763390,rE:-908060},{label:'Suministros',aE:-69934,rE:-37928}]},bn:{a:501614,pct:0.1502,dE:314639},cf:{a:718434,pct:0.2151,dE:318133},mant:{aE:-138835,rE:-156648}},acu:{ti:{a:3339862,dE:254579},mb:{a:1493952,pct:0.4473,refPct:0.3982,dE:265381,causes:[{label:'Compras de materiales',actual:-0.03543,ref:-0.12333},{label:'Subcontratas externas',actual:-0.38712,ref:-0.34957}]},ebitda:{a:823359,pct:0.2465,dE:371065,causes:[{label:'Gastos operativos',aE:-763390,rE:-908060},{label:'Suministros',aE:-69934,rE:-37928}]},bn:{a:501614,pct:0.1502,dE:314639},cf:{a:718434,pct:0.2151,dE:318133},mant:{aE:-138835,rE:-156648}}},e1:{name:'Empresa 1',alerta:null,mes:{ti:{a:1689677,dE:-198671},mb:{a:751575,pct:0.4448,refPct:0.3686,dE:55556,causes:[{label:'Compras de materiales',actual:-0.03668,ref:-0.09103},{label:'Subcontratas internas',actual:0,ref:-0.12829},{label:'Subcontratas externas',actual:-0.44634,ref:-0.34643}]},ebitda:{a:418972,pct:0.2480,dE:107023,causes:[{label:'Gastos operativos',aE:-384158,rE:-431718},{label:'Otros servicios',aE:-79205,rE:-115012}]},bn:{a:191701,pct:0.1135,dE:90867},cf:{a:369768,pct:0.2188,dE:91215},mant:{aE:-110124,rE:-123758,fixed:true}},acu:{ti:{a:1689677,dE:-198671},mb:{a:751575,pct:0.4448,refPct:0.3686,dE:55556,causes:[{label:'Compras de materiales',actual:-0.03668,ref:-0.09103},{label:'Subcontratas internas',actual:0,ref:-0.12829},{label:'Subcontratas externas',actual:-0.44634,ref:-0.34643}]},ebitda:{a:418972,pct:0.2480,dE:107023,causes:[{label:'Gastos operativos',aE:-384158,rE:-431718},{label:'Otros servicios',aE:-79205,rE:-115012}]},bn:{a:191701,pct:0.1135,dE:90867},cf:{a:369768,pct:0.2188,dE:91215},mant:{aE:-110124,rE:-123758,fixed:true}}},e2:{name:'Empresa 2',alerta:null,mes:{ti:{a:1186216,dE:95323},mb:{a:500135,pct:0.4216,refPct:0.3024,dE:170221,causes:[{label:'Compras de materiales',actual:-0.02937,ref:-0.09839},{label:'Subcontratas internas',actual:0,ref:-0.09331}]},ebitda:{a:286652,pct:0.2417,dE:109290,causes:[{label:'Suministros (atípico)',aE:-38815,rE:-11105},{label:'Otros servicios',aE:-53541,rE:-62309}]},bn:{a:220937,pct:0.1863,dE:73544},cf:{a:247681,pct:0.2088,dE:76263},mant:{aE:-19228,rE:-23663,show:false}},acu:{ti:{a:1186216,dE:95323},mb:{a:500135,pct:0.4216,refPct:0.3024,dE:170221,causes:[{label:'Compras de materiales',actual:-0.02937,ref:-0.09839},{label:'Subcontratas internas',actual:0,ref:-0.09331}]},ebitda:{a:286652,pct:0.2417,dE:109290,causes:[{label:'Suministros (atípico)',aE:-38815,rE:-11105},{label:'Otros servicios',aE:-53541,rE:-62309}]},bn:{a:220937,pct:0.1863,dE:73544},cf:{a:247681,pct:0.2088,dE:76263},mant:{aE:-19228,rE:-23663,show:false}}},e3:{name:'Empresa 3',alerta:null,mes:{ti:{a:166494,dE:33526},mb:{a:82171,pct:0.4935,refPct:0.3235,dE:39153,causes:[{label:'Compras de materiales',actual:-0.05983,ref:-0.20523},{label:'Variación obra en curso',isOC:true,dE:46813}]},ebitda:{a:63929,pct:0.3840,dE:37635,causes:[{label:'Gastos operativos',aE:-18591,rE:-16858}]},bn:{a:53757,pct:0.3229,dE:31936},cf:{a:54463,pct:0.3271,dE:31835},mant:{aE:-4160,rE:-2150,show:true}},acu:{ti:{a:166494,dE:33526},mb:{a:82171,pct:0.4935,refPct:0.3235,dE:39153,causes:[{label:'Compras de materiales',actual:-0.05983,ref:-0.20523},{label:'Variación obra en curso',isOC:true,dE:46813}]},ebitda:{a:63929,pct:0.3840,dE:37635,causes:[{label:'Gastos operativos',aE:-18591,rE:-16858}]},bn:{a:53757,pct:0.3229,dE:31936},cf:{a:54463,pct:0.3271,dE:31835},mant:{aE:-4160,rE:-2150,show:true}}},e4:{name:'Empresa 4',alerta:'Sin actividad comercial en enero. Total ingresos = 9.391€ (solo obra en curso). EBITDA y beneficio negativos.',mes:{ti:{a:9391,dE:-83331},mb:{a:0,pct:null,refPct:0.2001,dE:-18552,causes:[]},ebitda:{a:-3341,pct:null,dE:-17326,causes:[]},bn:{a:-2840,pct:null,dE:-14747},cf:{a:-2840,pct:null,dE:-14747},mant:{show:false}},acu:{ti:{a:9391,dE:-83331},mb:{a:0,pct:null,refPct:0.2001,dE:-18552,causes:[]},ebitda:{a:-3341,pct:null,dE:-17326,causes:[]},bn:{a:-2840,pct:null,dE:-14747},cf:{a:-2840,pct:null,dE:-14747},mant:{show:false}}},e5:{name:'Empresa 5',alerta:null,mes:{ti:{a:185183,dE:37485},mb:{a:67034,pct:0.3620,refPct:0.4280,dE:3816,causes:[{label:'Subcontratas externas',actual:-0.39721,ref:-0.24760}]},ebitda:{a:40367,pct:0.2180,dE:2983,causes:[{label:'Mantenimiento',aE:-3321,rE:-1969},{label:'Otros servicios',aE:-4489,rE:-4019}]},bn:{a:27923,pct:0.1508,dE:1625},cf:{a:33680,pct:0.1819,dE:1847},mant:{aE:-3321,rE:-1969,show:true}},acu:{ti:{a:185183,dE:37485},mb:{a:67034,pct:0.3620,refPct:0.4280,dE:3816,causes:[{label:'Subcontratas externas',actual:-0.39721,ref:-0.24760}]},ebitda:{a:40367,pct:0.2180,dE:2983,causes:[{label:'Mantenimiento',aE:-3321,rE:-1969},{label:'Otros servicios',aE:-4489,rE:-4019}]},bn:{a:27923,pct:0.1508,dE:1625},cf:{a:33680,pct:0.1819,dE:1847},mant:{aE:-3321,rE:-1969,show:true}}},e6:{name:'Empresa 6',alerta:nul
